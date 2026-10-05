@@ -13,13 +13,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # Android SDK sudah preinstalled di runner ubuntu-latest
+      # (ANDROID_HOME / ANDROID_SDK_ROOT), jadi tanpa setup-android.
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
