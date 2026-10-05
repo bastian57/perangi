@@ -1,0 +1,39 @@
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    namespace = "id.perangi"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "id.perangi"
+        minSdk = 26
+        targetSdk = 34
+        versionCode = 1
+        versionName = "0.1.0-skeleton"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+        }
+        release {
+            minifyEnabled = false
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+    // Skeleton: tanpa dependensi eksternal (build tercepat & paling andal).
+    // Fase 1: tambah pcap4j (MIT) + dnsjava (BSD) untuk parsing DNS
+    // yang lebih lengkap — lihat FASE0_RESEARCH.md bagian 2 & 7.
+}
