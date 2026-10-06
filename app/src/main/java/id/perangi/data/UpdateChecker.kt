@@ -20,7 +20,7 @@ data class ReleaseInfo(
  * Tanpa login, tanpa server sendiri — memakai API publik GitHub.
  */
 object UpdateChecker {
-    private const val API = "https://api.github.com/bastian57/perangi/releases/latest"
+    private const val API = "https://api.github.com/repos/bastian57/perangi/releases/latest"
 
     fun installedVersion(ctx: Context): String = try {
         ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "?"
