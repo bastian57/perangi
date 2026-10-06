@@ -1,8 +1,10 @@
--- FASE 3a — skema Supabase untuk kurasi laporan komunitas.
--- Cara pakai: Supabase dashboard → SQL Editor → New query → paste semua → Run.
--- Aman dijalankan ulang (IF NOT EXISTS).
+-- FASE 3 — skema Supabase untuk PERANGI (server komunitas).
+-- Dipakai di project: dieng-local (nebeng, tabel di-prefix perangi_).
+-- Cara pakai: Supabase dashboard → pilih project dieng-local → SQL Editor
+-- → New query → paste semua → Run. Aman dijalankan ulang.
 
-create table if not exists reports (
+-- 3a: laporan komunitas + voting
+create table if not exists perangi_reports (
   id uuid primary key default gen_random_uuid(),
   domain text not null,
   category text not null,
@@ -11,16 +13,49 @@ create table if not exists reports (
   created_at timestamptz not null default now(),
   unique (device_hash, domain)            -- 1 HP 1 suara per domain, dijamin database
 );
-create index if not exists reports_domain_idx on reports (domain);
-create index if not exists reports_status_idx on reports (status);
+create index if not exists perangi_reports_domain_idx on perangi_reports (domain);
+create index if not exists perangi_reports_status_idx on perangi_reports (status);
 
-alter table reports enable row level security;
+-- 3b: heartbeat HP anak (monitoring keluarga)
+create table if not exists perangi_heartbeats (
+  device_hash text primary key,
+  protection_on boolean not null,
+  blocked_today int not null default 0,
+  app_version text,
+  updated_at timestamptz not null default now()
+);
 
--- v1: anon boleh INSERT laporan. Abuse dibatasi oleh:
---   * unique(device_hash, domain) → 1 device fisik cuma 1 suara
---   * threshold 5 device berbeda untuk promote
---   * rate limit 5/hari di aplikasi
-drop policy if exists "anon ins reports" on reports;
-create policy "anon ins reports"
-  on reports for insert to anon
+-- 3b: pairing ortu-anak via kode 6 digit
+create table if not exists perangi_pairs (
+  code text primary key,
+  child_hash text not null,
+  parent_hash text,
+  parent_fcm_token text,                  -- diisi HP ortu saat pairing (3c)
+  created_at timestamptz not null default now()
+);
+
+alter table perangi_reports enable row level security;
+alter table perangi_heartbeats enable row level security;
+alter table perangi_pairs enable row level security;
+
+-- v1: anon boleh INSERT laporan & UPSERT heartbeat, dan kelola pairs.
+-- Abuse dibatasi: unique(device_hash, domain), threshold 5 device untuk promote,
+-- rate limit 5/hari di aplikasi.
+drop policy if exists "anon ins perangi_reports" on perangi_reports;
+create policy "anon ins perangi_reports"
+  on perangi_reports for insert to anon
   with check (true);
+
+drop policy if exists "anon ins perangi_heartbeats" on perangi_heartbeats;
+create policy "anon ins perangi_heartbeats"
+  on perangi_heartbeats for insert to anon
+  with check (true);
+drop policy if exists "anon upd perangi_heartbeats" on perangi_heartbeats;
+create policy "anon upd perangi_heartbeats"
+  on perangi_heartbeats for update to anon
+  using (true);
+
+drop policy if exists "anon perangi_pairs" on perangi_pairs;
+create policy "anon perangi_pairs"
+  on perangi_pairs for all to anon
+  using (true) with check (true);

@@ -73,7 +73,7 @@ def main():
 
     st, rows = sbase(
         "GET",
-        "/rest/v1/reports?select=domain,category,device_hash&status=eq.pending",
+        "/rest/v1/perangi_reports?select=domain,category,device_hash&status=eq.pending",
     )
     if st != 200 or rows is None:
         print(f"GAGAL baca reports: HTTP {st}")
@@ -102,7 +102,7 @@ def main():
             data["categories"][key].append(domain)
         promoted.append((domain, g["category"], len(g["voters"])))
         q = urllib.parse.quote(domain, safe="")
-        sbase("PATCH", f"/rest/v1/reports?domain=eq.{q}&status=eq.pending",
+        sbase("PATCH", f"/rest/v1/perangi_reports?domain=eq.{q}&status=eq.pending",
               {"status": "approved"})
 
     if not promoted:

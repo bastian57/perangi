@@ -28,7 +28,7 @@ class ReportUploadWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         for (r in pending) {
             val code = try {
                 Supabase.post(
-                    "reports",
+                    "perangi_reports",
                     JSONObject().apply {
                         put("domain", r.domain)
                         put("category", r.category)

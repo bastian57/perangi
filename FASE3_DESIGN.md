@@ -8,7 +8,7 @@ notifikasi orang tua LANGSUNG PUSH. Backend: Supabase (akun sudah ada).
 
 | # | Komponen | Jalan di | Fungsi |
 |---|----------|----------|--------|
-| 1 | Supabase Postgres | cloud Supabase | tabel `reports`, `heartbeats`, `pairs` |
+| 1 | Supabase Postgres | cloud Supabase | tabel `perangi_reports`, `perangi_heartbeats`, `perangi_pairs` |
 | 2 | Aplikasi PERANGI | HP user | upload laporan, heartbeat 15 mnt, pairing, terima FCM |
 | 3 | Action `kurasi.yml` | GitHub (tiap 1 jam) | hitung vote ≥ 5 → tulis `blocklist.json` → commit |
 | 4 | Action `monitor.yml` | GitHub (tiap 15 mnt) | cek heartbeat → kirim FCM ke ortu |
@@ -19,7 +19,7 @@ Aplikasi tetap narik `blocklist.json` dari GitHub raw tiap 6 jam — **tidak ber
 ## 2. Skema database
 
 ```sql
-create table reports (
+create table perangi_reports (
   id uuid primary key default gen_random_uuid(),
   domain text not null,
   category text not null,
@@ -28,10 +28,10 @@ create table reports (
   created_at timestamptz not null default now(),
   unique (device_hash, domain)             -- 1 HP 1 suara, dijamin database
 );
-create index reports_domain_idx on reports (domain);
-create index reports_status_idx on reports (status);
+create index perangi_reports_domain_idx on perangi_reports (domain);
+create index perangi_reports_status_idx on perangi_reports (status);
 
-create table heartbeats (
+create table perangi_heartbeats (
   device_hash text primary key,
   protection_on boolean not null,
   blocked_today int not null default 0,
@@ -39,7 +39,7 @@ create table heartbeats (
   updated_at timestamptz not null default now()
 );
 
-create table pairs (
+create table perangi_pairs (
   code text primary key,                  -- 6 digit, dibuat HP anak
   child_hash text not null,
   parent_hash text,
@@ -51,10 +51,10 @@ alter table reports enable row level security;
 alter table heartbeats enable row level security;
 alter table pairs enable row level security;
 -- v1: anon boleh insert/upsert (friction abuse: 1 device = 1 suara, butuh 5 device fisik)
-create policy "anon ins reports" on reports for insert to anon with check (true);
-create policy "anon ins hb" on heartbeats for insert to anon with check (true);
-create policy "anon upd hb" on heartbeats for update to anon using (true);
-create policy "anon pairs" on pairs for all to anon using (true) with check (true);
+create policy "anon ins reports" on perangi_reports for insert to anon with check (true);
+create policy "anon ins hb" on perangi_heartbeats for insert to anon with check (true);
+create policy "anon upd hb" on perangi_heartbeats for update to anon using (true);
+create policy "anon pairs" on perangi_pairs for all to anon using (true) with check (true);
 ```
 
 ## 3. Alur kurasi otomatis (laporan → blocklist global)
@@ -84,7 +84,7 @@ create policy "anon pairs" on pairs for all to anon using (true) with check (tru
      (OAuth2 dari `FIREBASE_SA_JSON` di GitHub Secrets).
    - isi: "⚠️ Proteksi di HP anak mati! Segera cek."
 4. **Terima push:** `PerangiFirebaseService : FirebaseMessagingService` → tampilkan notifikasi.
-   Token FCM direfresh otomatis → diupdate ke `pairs` saat pairing/dashboard dibuka.
+   Token FCM direfresh otomatis → diupdate ke `perangi_pairs` saat pairing/dashboard dibuka.
 5. **Dashboard ortu:** layar "Keluarga" di HP ortu → daftar anak + status (🟢 aman / 🔴 bahaya) via GET heartbeat.
 
 ## 5. Perubahan aplikasi (daftar file)

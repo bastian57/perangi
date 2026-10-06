@@ -12,8 +12,8 @@ import java.net.URL
  * SERVICE_ROLE_KEY JANGAN taruh di sini — itu milik GitHub Secrets untuk robot kurasi.
  */
 object Supabase {
-    const val URL = "https://GANTI_DENGAN_PROJECT_URL.supabase.co"
-    const val ANON_KEY = "GANTI_DENGAN_ANON_KEY"
+    const val URL = "https://zfvkovpdkdmzxwwhtrng.supabase.co"
+    const val ANON_KEY = "sb_publishable_GbWkbqe-eDDlrYwZiG8-Hg_YuYC6fW5"
 
     fun isConfigured(): Boolean =
         !URL.contains("GANTI_DENGAN") && !ANON_KEY.contains("GANTI_DENGAN")
