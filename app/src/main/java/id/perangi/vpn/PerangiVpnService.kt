@@ -10,6 +10,9 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelFileDescriptor
 import id.perangi.data.StatsRepository
+import id.perangi.data.StreakStore
+import id.perangi.data.WhitelistStore
+import id.perangi.data.ParentMode
 import id.perangi.ui.MainActivity
 import id.perangi.ui.VpnState
 import id.perangi.util.Logger
@@ -60,6 +63,8 @@ class PerangiVpnService : VpnService() {
         if (thread?.isAlive == true) return
         // Seed lokal dulu supaya proteksi langsung jalan walau offline.
         Blocklist.loadSeed(this)
+        WhitelistStore.init(this)
+        StreakStore.ensureStarted(this)
         startForeground(NOTIF_ID, buildNotification())
 
         // Trik DNS66: TEST-NET-1 (192.0.2.0/24, RFC 5737) sebagai alamat VPN,
@@ -109,10 +114,33 @@ class PerangiVpnService : VpnService() {
 
     override fun onRevoke() {
         // User mencabut izin VPN dari Settings — hentikan dengan bersih.
-        // TODO(Fase 3): picu "alarm wali" di sini (heartbeat berhenti).
         Logger.e("VPN", "Izin VPN dicabut sistem/user")
+        if (ParentMode.isEnabled(this)) {
+            alarmBocor()
+        }
         stopVpn()
         super.onRevoke()
+    }
+
+    /** Alarm Mode Orang Tua: proteksi dimatikan paksa dari luar aplikasi. */
+    private fun alarmBocor() {
+        val nm = getSystemService(NotificationManager::class.java)
+        nm.createNotificationChannel(
+            NotificationChannel("perangi_alarm", "Alarm PERANGI", NotificationManager.IMPORTANCE_HIGH)
+        )
+        val pi = PendingIntent.getActivity(
+            this, 0, Intent(this, MainActivity::class.java),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val n = Notification.Builder(this, "perangi_alarm")
+            .setContentTitle("⚠️ Proteksi PERANGI dimatikan!")
+            .setContentText("Seseorang mematikan proteksi dari luar aplikasi. Segera cek HP ini.")
+            .setSmallIcon(android.R.drawable.ic_lock_lock)
+            .setContentIntent(pi)
+            .setAutoCancel(true)
+            .build()
+        nm.notify(2, n)
+        Logger.e("VPN", "ALARM: proteksi dimatikan paksa (Mode Orang Tua aktif)")
     }
 
     private fun buildNotification(): Notification {

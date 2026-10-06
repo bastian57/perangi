@@ -3,6 +3,7 @@ package id.perangi.vpn
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import id.perangi.data.StatsRepository
+import id.perangi.data.WhitelistStore
 import id.perangi.util.Logger
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -50,7 +51,7 @@ class PerangiVpnThread(
                     null
                 } ?: continue
                 val name = query.queryName ?: continue
-                val dnsAnswer = if (Blocklist.isBlocked(name)) {
+                val dnsAnswer = if (!WhitelistStore.contains(name) && Blocklist.isBlocked(name)) {
                     stats.recordBlocked(name)
                     Logger.d("Filter", "Diblokir: $name")
                     DnsPacket.buildNxDomainDns(query)

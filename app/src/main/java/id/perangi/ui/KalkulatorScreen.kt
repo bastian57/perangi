@@ -16,11 +16,13 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -52,7 +54,13 @@ private fun formatRibuan(digits: String): String {
 
 @Composable
 private fun KalkulatorJudol(modifier: Modifier = Modifier) {
+    val ctx = LocalContext.current
     var harianRaw by remember { mutableStateOf("50000") }
+    // Simpan untuk layar Darurat (SOS).
+    LaunchedEffect(harianRaw) {
+        ctx.getSharedPreferences("perangi", android.content.Context.MODE_PRIVATE)
+            .edit().putString("sos_harian", harianRaw).apply()
+    }
     val perHari = harianRaw.toDoubleOrNull() ?: 0.0
     val perBulan = perHari * 30
     val perTahun = perHari * 365

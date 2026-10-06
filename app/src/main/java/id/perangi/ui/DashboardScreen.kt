@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.perangi.blocklist.BlocklistUpdateWorker
+import id.perangi.data.ParentMode
 import id.perangi.data.StatsRepository
+import id.perangi.data.StreakStore
 import id.perangi.util.Logger
 import id.perangi.vpn.Blocklist
 import id.perangi.vpn.PerangiVpnService
@@ -44,11 +47,12 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun DashboardScreen(modifier: Modifier = Modifier) {
+fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
     val ctx = LocalContext.current
     val stats = remember { StatsRepository(ctx) }
     var tick by remember { mutableStateOf(0) }
     val running = VpnState.running
+    var showPinGate by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -61,17 +65,31 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         Logger.d("UI", "Dashboard dibuka")
     }
 
+    if (showPinGate) {
+        PinDialog(
+            title = "PIN Mode Orang Tua",
+            onDismiss = { showPinGate = false },
+            onVerified = {
+                showPinGate = false
+                stopVpnService(ctx)
+                tick++
+            }
+        )
+    }
+
     val recent = remember(tick, running) { stats.recentBlocked() }
     val logs = remember(tick, running) { Logger.snapshot().takeLast(40).reversed() }
     val total = remember(tick, running) { stats.totalBlocked() }
     val domains = remember(tick, running) { Blocklist.size() }
+    val streak = remember(tick, running) { StreakStore.days(ctx) }
 
     fun setProteksi(on: Boolean) {
         if (on) {
             val intent = VpnService.prepare(ctx)
             if (intent != null) launcher.launch(intent) else startVpnService(ctx)
         } else {
-            stopVpnService(ctx)
+            if (ParentMode.isEnabled(ctx)) showPinGate = true
+            else stopVpnService(ctx)
         }
     }
 
@@ -107,20 +125,45 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                             else MaterialTheme.colorScheme.error
                         )
                         Spacer(Modifier.height(4.dp))
-                        Text(
-                            "Situs diblokir: $total",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            "Domain di daftar: $domains",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Text("🔥 $streak hari terlindungi")
+                        Text("Situs diblokir: $total")
+                        Text("Domain di daftar: $domains")
                     }
                     Switch(
                         checked = running,
                         onCheckedChange = { setProteksi(it) }
                     )
                 }
+            }
+        }
+        item {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    onClick = { onNav(SubScreen.Kesehatan) },
+                    modifier = Modifier.weight(1f)
+                ) { Text("🩺 Tes") }
+                Button(
+                    onClick = { onNav(SubScreen.OrangTua) },
+                    modifier = Modifier.weight(1f)
+                ) { Text("👨‍👩‍👧 Ortu") }
+            }
+        }
+        item {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    onClick = { onNav(SubScreen.Lapor) },
+                    modifier = Modifier.weight(1f)
+                ) { Text("📝 Lapor") }
+                Button(
+                    onClick = { onNav(SubScreen.Whitelist) },
+                    modifier = Modifier.weight(1f)
+                ) { Text("✅ Putih") }
             }
         }
         item {
