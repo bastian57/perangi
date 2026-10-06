@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,6 +48,10 @@ fun OnboardingScreen(onFinish: () -> Unit) {
         }
     }
 
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
     Column(
         Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.Center,
@@ -140,6 +145,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
             color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.bodySmall
         )
+    }
     }
 }
 
