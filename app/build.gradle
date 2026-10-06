@@ -11,8 +11,8 @@ android {
         applicationId = "id.perangi"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0-skeleton"
+        versionCode = 2
+        versionName = "0.2.0-fase1"
     }
 
     buildTypes {
@@ -30,10 +30,30 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
 }
 
 dependencies {
-    // Skeleton: tanpa dependensi eksternal (build tercepat & paling andal).
-    // Fase 1: tambah pcap4j (MIT) + dnsjava (BSD) untuk parsing DNS
-    // yang lebih lengkap — lihat FASE0_RESEARCH.md bagian 2 & 7.
+    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.activity:activity-compose:1.9.2")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Fase 2: pcap4j (MIT) + dnsjava (BSD) untuk parsing DNS yang lebih lengkap.
+    // Lihat FASE0_RESEARCH.md bagian 2 & 7.
 }

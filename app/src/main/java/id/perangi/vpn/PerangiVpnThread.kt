@@ -32,6 +32,7 @@ class PerangiVpnThread(
         service.protect(socket)
         socket.soTimeout = 4000
         val buf = ByteArray(32767)
+        id.perangi.util.Logger.d("VPN", "Thread filter berjalan")
         try {
             while (!isInterrupted) {
                 val len = try {
@@ -40,10 +41,17 @@ class PerangiVpnThread(
                     break // TUN ditutup
                 }
                 if (len <= 0) continue
-                val query = DnsPacket.parse(buf.copyOf(len)) ?: continue
+                // Bungkus parsing: satu paket aneh tidak boleh membunuh thread
+                // (thread mati = TUN buntu = internet lumpuh total).
+                val query = try {
+                    DnsPacket.parse(buf.copyOf(len))
+                } catch (_: Exception) {
+                    null
+                } ?: continue
                 val name = query.queryName ?: continue
                 val dnsAnswer = if (Blocklist.isBlocked(name)) {
                     stats.recordBlocked(name)
+                    Logger.d("Filter", "Diblokir: $name")
                     DnsPacket.buildNxDomainDns(query)
                 } else {
                     forward(query.dnsPayload, socket) ?: continue

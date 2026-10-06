@@ -6,10 +6,13 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
+import android.os.Handler
+import android.os.Looper
 import android.os.ParcelFileDescriptor
 import id.perangi.data.StatsRepository
 import id.perangi.ui.MainActivity
-
+import id.perangi.ui.VpnState
+import id.perangi.util.Logger
 /**
  * VpnService PERANGI — DNS-only VPN (arsitektur terinspirasi DNS66,
  * lihat FASE0_RESEARCH.md bagian 1). Hanya rute DNS yang masuk TUN;
@@ -26,6 +29,24 @@ class PerangiVpnService : VpnService() {
 
     private var tun: ParcelFileDescriptor? = null
     private var thread: PerangiVpnThread? = null
+    private val handler = Handler(Looper.getMainLooper())
+
+    /**
+     * Watchdog: kalau thread filter mati diam-diam (TUN buntu = internet lumpuh),
+     * bangun ulang VPN. Proteksi boleh mati sesaat, internet tidak boleh mati.
+     */
+    private val watchdog = object : Runnable {
+        override fun run() {
+            if (tun != null && thread?.isAlive != true) {
+                Logger.e("VPN", "Watchdog: thread filter mati — membangun ulang")
+                try { tun?.close() } catch (_: Exception) {}
+                tun = null
+                thread = null
+                startVpn()
+            }
+            handler.postDelayed(this, 10_000)
+        }
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
@@ -63,13 +84,20 @@ class PerangiVpnService : VpnService() {
         }
         tun = newTun
         thread = PerangiVpnThread(this, newTun, StatsRepository(this)).also { it.start() }
+        VpnState.running = true
+        Logger.d("VPN", "Proteksi dimulai (upstream 1.1.1.1, seed=${Blocklist.size()} domain)")
+        handler.removeCallbacks(watchdog)
+        handler.postDelayed(watchdog, 10_000)
     }
 
     private fun stopVpn() {
+        handler.removeCallbacks(watchdog)
         thread?.interrupt()
         thread = null
         try { tun?.close() } catch (_: Exception) {}
         tun = null
+        VpnState.running = false
+        Logger.d("VPN", "Proteksi dihentikan")
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
@@ -82,6 +110,7 @@ class PerangiVpnService : VpnService() {
     override fun onRevoke() {
         // User mencabut izin VPN dari Settings — hentikan dengan bersih.
         // TODO(Fase 3): picu "alarm wali" di sini (heartbeat berhenti).
+        Logger.e("VPN", "Izin VPN dicabut sistem/user")
         stopVpn()
         super.onRevoke()
     }
