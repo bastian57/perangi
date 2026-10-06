@@ -3,6 +3,7 @@ package id.perangi.vpn
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import id.perangi.data.StatsRepository
+import id.perangi.util.Logger
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.DatagramPacket
@@ -32,7 +33,7 @@ class PerangiVpnThread(
         service.protect(socket)
         socket.soTimeout = 4000
         val buf = ByteArray(32767)
-        id.perangi.util.Logger.d("VPN", "Thread filter berjalan")
+        Logger.d("VPN", "Thread filter berjalan")
         try {
             while (!isInterrupted) {
                 val len = try {
