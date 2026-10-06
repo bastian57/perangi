@@ -22,9 +22,20 @@ jobs:
       # (ANDROID_HOME / ANDROID_SDK_ROOT), jadi tanpa setup-android.
 
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :app:assembleDebug --stacktrace 2>&1 | tee gradle-build.log
+
+      - name: Upload build log (selalu, biar build merah bisa didiagnosis)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: gradle-build.log
+          retention-days: 7
 
       - name: Upload APK artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: perangi-debug-apk
