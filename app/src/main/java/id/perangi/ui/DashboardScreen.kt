@@ -36,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.perangi.blocklist.BlocklistUpdateWorker
+import id.perangi.blocklist.ReportUploadWorker
 import id.perangi.data.ParentMode
+import id.perangi.data.ReportStore
 import id.perangi.data.StatsRepository
 import id.perangi.data.StreakStore
 import id.perangi.util.Logger
@@ -63,6 +65,10 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
 
     LaunchedEffect(Unit) {
         BlocklistUpdateWorker.schedule(ctx)
+        // Fase 3a: upload sisa laporan yang belum terkirim ke server
+        if (ReportStore.pendingUpload(ctx).isNotEmpty()) {
+            ReportUploadWorker.enqueue(ctx)
+        }
         Logger.d("UI", "Dashboard dibuka")
     }
 

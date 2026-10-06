@@ -64,8 +64,7 @@ object ReportStore {
         return null
     }
 
-    fun myReports(ctx: Context): List<Report> {
-        val arr = try {
+    fun myReports(ctx: Context): List<Report> {        val arr = try {
             JSONArray(prefs(ctx).getString("queue", "[]"))
         } catch (_: Exception) {
             return emptyList()
@@ -78,6 +77,19 @@ object ReportStore {
                 null
             }
         }.reversed()
+    }
+
+    /** Laporan lokal yang belum terupload ke server (Fase 3a). */
+    fun pendingUpload(ctx: Context): List<Report> {
+        val uploaded = prefs(ctx).getStringSet("uploaded", emptySet()).orEmpty()
+        return myReports(ctx).filter { it.domain !in uploaded }
+    }
+
+    fun markUploaded(ctx: Context, domains: List<String>) {
+        val p = prefs(ctx)
+        val set = p.getStringSet("uploaded", emptySet()).orEmpty().toMutableSet()
+        set.addAll(domains)
+        p.edit().putStringSet("uploaded", set).apply()
     }
 
     private fun normalize(d: String) = d.trim().trimEnd('.').lowercase()

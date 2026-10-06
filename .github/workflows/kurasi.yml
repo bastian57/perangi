@@ -1,0 +1,40 @@
+name: Kurasi Blocklist (Fase 3a)
+
+# Tiap jam: promote laporan dengan >=5 suara device unik ke blocklist.json.
+# Butuh Secrets: SUPABASE_URL, SUPABASE_SERVICE_KEY.
+# Graceful-skip kalau secrets belum diisi.
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+jobs:
+  kurasi:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run kurasi
+        run: python3 tools/kurasi.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Commit blocklist jika berubah
+        run: |
+          if git diff --quiet blocklist/blocklist.json; then
+            echo "tidak ada perubahan blocklist"
+          else
+            git config user.name "perangi-bot"
+            git config user.email "bot@perangi.id"
+            git add blocklist/blocklist.json
+            git commit -m "Kurasi otomatis: blocklist update"
+            git push
+          fi

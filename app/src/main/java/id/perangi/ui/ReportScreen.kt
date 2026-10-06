@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import id.perangi.data.REPORT_CATEGORIES
 import id.perangi.data.ReportStore
+import id.perangi.blocklist.ReportUploadWorker
 import id.perangi.util.Logger
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -100,6 +101,7 @@ fun ReportScreen(modifier: Modifier = Modifier) {
                         msgOk = true
                         domain = ""
                         refresh++
+                        ReportUploadWorker.enqueue(ctx)
                         Logger.d("UI", "Laporan dikirim: $category")
                     } else {
                         msg = err
