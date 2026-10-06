@@ -1,13 +1,18 @@
 package id.perangi.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import id.perangi.R
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +39,11 @@ import kotlin.math.pow
 fun KalkulatorScreen(modifier: Modifier = Modifier) {
     var tab by remember { mutableStateOf(0) }
     Column(modifier.fillMaxSize()) {
+        Image(
+            painterResource(R.drawable.img_kalkulator), "Kalkulator",
+            Modifier.fillMaxWidth().height(110.dp).padding(bottom = 8.dp),
+            contentScale = ContentScale.Crop
+        )
         TabRow(selectedTabIndex = tab) {
             Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text("Rugi Judol") })
             Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text("Bunga Pinjol") })

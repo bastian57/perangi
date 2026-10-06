@@ -1,6 +1,7 @@
 package id.perangi.ui
 
 import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,8 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import id.perangi.R
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -52,7 +59,11 @@ fun SosScreen(modifier: Modifier = Modifier, onOpenKalkulator: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("🆘", fontSize = 64.sp)
+        Image(
+            painterResource(R.drawable.img_sos), "SOS",
+            Modifier.size(120.dp).clip(RoundedCornerShape(24.dp)),
+            contentScale = ContentScale.Crop
+        )
         Spacer(Modifier.height(8.dp))
         Text(
             "TAHAN.",

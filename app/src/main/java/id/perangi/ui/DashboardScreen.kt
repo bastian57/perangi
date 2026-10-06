@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.VpnService
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,8 +16,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,6 +33,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.ExperimentalFoundationApi
+import id.perangi.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +65,39 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+private val QUOTES_TEMPUR = listOf(
+    "Judol itu pajak orang putus asa",
+    "Pinjol ilegal = lintah digital",
+    "Sekali klik judol, selamanya dikejar bandar",
+    "Berhenti sekarang lebih murah daripada berhenti nanti",
+    "Uang panas judol tidak pernah membawa berkah",
+    "Pinjol ilegal menagih dengan teror, bukan aturan"
+)
+
+@Composable
+private fun MenuCard(
+    label: String,
+    img: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(onClick = onClick, modifier = modifier) {
+        Column(
+            Modifier.padding(12.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Image(
+                painterResource(img), label,
+                Modifier.size(56.dp).clip(RoundedCornerShape(14.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Text(label, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
     val ctx = LocalContext.current
@@ -93,6 +141,11 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
     val domains = remember(tick, running) { Blocklist.size() }
     val streak = remember(tick, running) { StreakStore.days(ctx) }
 
+    val marqueeText = remember(total, streak) {
+        "🛡️ $total situs diblokir • 🔥 $streak hari terlindungi • " +
+            QUOTES_TEMPUR.joinToString(" • ") { "💬 $it" } + " • "
+    }
+
     fun setProteksi(on: Boolean) {
         if (on) {
             val intent = VpnService.prepare(ctx)
@@ -114,6 +167,29 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
+        }
+        item {
+            Image(
+                painterResource(R.drawable.hero_banner), "PERANGI",
+                Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(18.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Text(
+                    marqueeText,
+                    modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                        .padding(12.dp).fillMaxWidth(),
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
         item {
             Card(
@@ -152,14 +228,10 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(
-                    onClick = { onNav(SubScreen.Kesehatan) },
-                    modifier = Modifier.weight(1f)
-                ) { Text("🩺 Tes") }
-                Button(
-                    onClick = { onNav(SubScreen.OrangTua) },
-                    modifier = Modifier.weight(1f)
-                ) { Text("👨‍👩‍👧 Ortu") }
+                MenuCard("Tes", R.drawable.img_tes,
+                    onClick = { onNav(SubScreen.Kesehatan) }, modifier = Modifier.weight(1f))
+                MenuCard("Ortu", R.drawable.img_ortu,
+                    onClick = { onNav(SubScreen.OrangTua) }, modifier = Modifier.weight(1f))
             }
         }
         item {
@@ -167,27 +239,22 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(
-                    onClick = { onNav(SubScreen.Lapor) },
-                    modifier = Modifier.weight(1f)
-                ) { Text("📝 Lapor") }
-                Button(
-                    onClick = { onNav(SubScreen.Whitelist) },
-                    modifier = Modifier.weight(1f)
-                ) { Text("✅ Putih") }
+                MenuCard("Lapor", R.drawable.img_lapor,
+                    onClick = { onNav(SubScreen.Lapor) }, modifier = Modifier.weight(1f))
+                MenuCard("Putih", R.drawable.img_putih,
+                    onClick = { onNav(SubScreen.Whitelist) }, modifier = Modifier.weight(1f))
             }
         }
         item {
-            Button(
-                onClick = { onNav(SubScreen.Keluarga) },
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("👪 Keluarga") }
-        }
-        item {
-            Button(
-                onClick = { onNav(SubScreen.AppScan) },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("📱 Scan Aplikasi Judi/Pinjol") }
+            ) {
+                MenuCard("Scan", R.drawable.img_scan,
+                    onClick = { onNav(SubScreen.AppScan) }, modifier = Modifier.weight(1f))
+                MenuCard("Keluarga", R.drawable.img_keluarga,
+                    onClick = { onNav(SubScreen.Keluarga) }, modifier = Modifier.weight(1f))
+            }
         }
         item {
             OutlinedButton(
