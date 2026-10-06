@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # untuk publish rolling release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,3 +43,21 @@ jobs:
           name: perangi-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+      # Rilis rolling "latest": setiap build hijau langsung bisa diunduh
+      # publik + dibaca fitur "Cek Pembaruan" di aplikasi.
+      - name: Rename APK for stable download URL
+        if: success()
+        run: cp app/build/outputs/apk/debug/app-debug.apk perangi.apk
+
+      - name: Publish rolling release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "PERANGI — Build Terbaru"
+          body: |
+            Build otomatis dari GitHub Actions (commit ${{ github.sha }}).
+            Unduh `perangi.apk`, install, ikuti onboarding di aplikasi.
+          prerelease: false
+          files: perangi.apk

@@ -175,6 +175,12 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
             ) { Text("📱 Scan Aplikasi Judi/Pinjol") }
         }
         item {
+            OutlinedButton(
+                onClick = { onNav(SubScreen.Tentang) },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("⬇️ Cek Pembaruan & Tentang") }
+        }
+        item {
             Text("Terakhir diblokir", style = MaterialTheme.typography.titleMedium)
         }
         if (recent.isEmpty()) {

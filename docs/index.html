@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PERANGI — Perang Melawan Judol &amp; Pinjol Ilegal</title>
+<meta name="description" content="Aplikasi Android gratis yang memblokir situs judi online, pinjol ilegal, dan iklan judi langsung di HP — tanpa root.">
+<style>
+  :root { --bg:#0B0F17; --card:#1A2233; --red:#E63946; --gold:#FFB800; --text:#F5F7FA; --muted:#9AA4B5; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.6; }
+  .wrap { max-width:720px; margin:0 auto; padding:0 20px; }
+  header.hero { text-align:center; padding:72px 0 48px; }
+  .shield { font-size:72px; }
+  h1 { font-size:44px; letter-spacing:2px; margin:12px 0 4px; }
+  .tagline { color:var(--muted); font-size:18px; margin-bottom:28px; }
+  .btn { display:inline-block; background:var(--red); color:#fff; font-weight:700; font-size:18px;
+         padding:16px 44px; border-radius:999px; text-decoration:none; margin:6px; }
+  .btn.ghost { background:transparent; border:2px solid var(--red); }
+  .btn small { display:block; font-weight:400; font-size:12px; opacity:.8; }
+  section { padding:36px 0; }
+  h2 { font-size:26px; margin-bottom:16px; color:var(--gold); }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:520px){ .grid{grid-template-columns:1fr;} }
+  .card { background:var(--card); border-radius:14px; padding:18px; }
+  .card b { display:block; margin-bottom:6px; font-size:16px; }
+  .card p { color:var(--muted); font-size:14px; }
+  ol.steps { padding-left:22px; color:var(--muted); }
+  ol.steps li { margin-bottom:10px; }
+  ol.steps b { color:var(--text); }
+  .faq details { background:var(--card); border-radius:12px; padding:14px 18px; margin-bottom:10px; }
+  .faq summary { font-weight:700; cursor:pointer; }
+  .faq p { color:var(--muted); font-size:14px; margin-top:8px; }
+  footer { text-align:center; padding:36px 0 56px; color:var(--muted); font-size:13px; }
+  footer a { color:var(--gold); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="shield">🛡️</div>
+    <h1>PERANGI</h1>
+    <p class="tagline">Perang Melawan Judol &amp; Pinjol Ilegal.<br>
+    Blokir situs judi online, pinjol ilegal, dan iklan judi langsung di HP — tanpa root, gratis.</p>
+    <a class="btn" href="https://github.com/bastian57/perangi/releases/latest/download/perangi.apk">
+      ⬇️ Download APK<small>Android 8.0+ • gratis • tanpa iklan</small>
+    </a><br>
+    <a class="btn ghost" href="https://github.com/bastian57/perangi">Kode Sumber di GitHub</a>
+  </header>
+
+  <section>
+    <h2>Kenapa PERANGI?</h2>
+    <div class="grid">
+      <div class="card"><b>🚫 Filter DNS on-device</b><p>Situs judol &amp; pinjol ilegal diblokir sebelum sempat dibuka. Semua diproses lokal di HP — data tidak dikirim ke server mana pun.</p></div>
+      <div class="card"><b>🔤 Blokir pola kata</b><p>Bandar ganti domain tiap hari? Pola khas seperti <i>togel, gacor, maxwin</i> tetap kena blokir otomatis.</p></div>
+      <div class="card"><b>👨‍👩‍👧 Mode Orang Tua</b><p>Kunci proteksi dengan PIN. Kalau dimatikan paksa dari luar, HP kasih peringatan.</p></div>
+      <div class="card"><b>🆘 Tombol Darurat</b><p>Lagi pengen main? Satu tap: ingat berapa ratus juta yang bakal hangus, plus saran hubungi orang terdekat.</p></div>
+      <div class="card"><b>🧮 Kalkulator Rugi</b><p>Hitung berapa uangmu yang dibakar judol &amp; bunga pinjol — angkanya bikin sadar.</p></div>
+      <div class="card"><b>🏦 Cek Pinjol OJK</b><p>Cek status pinjol dari direktori OJK: legal, ilegal, atau tidak dikenal.</p></div>
+      <div class="card"><b>📱 Scan Aplikasi</b><p>Deteksi APK judi/pinjol ilegal yang terinstal — yang lolos filter DNS pun ketahuan.</p></div>
+      <div class="card"><b>📝 Laporan Komunitas</b><p>Temu situs baru? Laporkan — lindungi pengguna lain.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cara Install</h2>
+    <ol class="steps">
+      <li><b>Download APK</b> dari tombol di atas.</li>
+      <li><b>Izinkan install</b> — Android akan minta izin "install dari sumber tak dikenal", izinkan untuk browser/WhatsApp yang kamu pakai.</li>
+      <li><b>Buka PERANGI</b> dan ikuti 3 langkah onboarding (aktifkan VPN lokal).</li>
+      <li><b>Matikan Secure DNS</b> di Chrome &amp; DNS Pribadi di Setelan HP — aplikasinya memandu caranya.</li>
+    </ol>
+  </section>
+
+  <section class="faq">
+    <h2>Tanya Jawab</h2>
+    <details><summary>Apakah data saya dikirim ke server?</summary>
+      <p>Tidak. Penyaringan DNS berjalan 100% lokal di HP (VPN lokal, bukan VPN betulan). Satu-satunya koneksi keluar: cek pembaruan blocklist &amp; aplikasi dari GitHub.</p></details>
+    <details><summary>Kenapa tidak ada di Play Store?</summary>
+      <p>Kebijakan Play Store melarang aplikasi DNS blocker on-device. Makanya PERANGI didistribusikan langsung sebagai APK dari GitHub resmi ini.</p></details>
+    <details><summary>Apakah benar-benar gratis?</summary>
+      <p>Ya. Gratis, tanpa iklan, tanpa akun. Dibuat untuk misi sosial: Indonesia bebas judol &amp; pinjol ilegal.</p></details>
+    <details><summary>Anak saya bisa mengakali dengan uninstall?</summary>
+      <p>Di HP biasa, ya — tidak ada aplikasi yang bisa mencegah uninstall tanpa menjadi malware. Gunakan Mode Orang Tua + alarm, dan untuk anak kecil kombinasikan dengan Google Family Link.</p></details>
+  </section>
+
+  <footer>
+    <p>PERANGI — dibuat dengan ♥ untuk Indonesia bebas judol &amp; pinjol ilegal.</p>
+    <p>Butuh bantuan pinjol? Hubungi OJK di <b>157</b> (Senin–Jumat).</p>
+    <p><a href="https://github.com/bastian57/perangi">github.com/bastian57/perangi</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
