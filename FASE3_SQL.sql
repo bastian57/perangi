@@ -38,6 +38,12 @@ alter table perangi_reports enable row level security;
 alter table perangi_heartbeats enable row level security;
 alter table perangi_pairs enable row level security;
 
+-- WAJIB: RLS policy saja tidak cukup — role anon butuh GRANT eksplisit.
+grant insert on perangi_reports to anon;
+grant insert, update on perangi_heartbeats to anon;
+grant select on perangi_heartbeats to anon;
+grant all on perangi_pairs to anon;
+
 -- v1: anon boleh INSERT laporan & UPSERT heartbeat, dan kelola pairs.
 -- Abuse dibatasi: unique(device_hash, domain), threshold 5 device untuk promote,
 -- rate limit 5/hari di aplikasi.
@@ -59,3 +65,9 @@ drop policy if exists "anon perangi_pairs" on perangi_pairs;
 create policy "anon perangi_pairs"
   on perangi_pairs for all to anon
   using (true) with check (true);
+
+-- 3b: dashboard ortu perlu BACA heartbeat anak pasangannya
+drop policy if exists "anon sel perangi_heartbeats" on perangi_heartbeats;
+create policy "anon sel perangi_heartbeats"
+  on perangi_heartbeats for select to anon
+  using (true);

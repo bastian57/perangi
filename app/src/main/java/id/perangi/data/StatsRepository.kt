@@ -11,16 +11,27 @@ class StatsRepository(context: Context) {
 
     fun recordBlocked(domain: String) {
         val total = prefs.getLong("blocked_total", 0) + 1
+        val day = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US)
+            .format(java.util.Date())
+        val dayKey = "blocked_day_$day"
         val recent = ("${System.currentTimeMillis()}|$domain\n" + prefs.getString("recent", "").orEmpty())
             .lineSequence().take(20).joinToString("\n")
         prefs.edit()
             .putLong("blocked_total", total)
+            .putLong(dayKey, prefs.getLong(dayKey, 0) + 1)
             .putString("last_blocked", domain)
             .putString("recent", recent)
             .apply()
     }
 
     fun totalBlocked(): Long = prefs.getLong("blocked_total", 0)
+
+    /** Jumlah blokir hari ini (kunci harian yyyyMMdd). */
+    fun blockedToday(): Long {
+        val day = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US)
+            .format(java.util.Date())
+        return prefs.getLong("blocked_day_$day", 0)
+    }
 
     fun lastBlocked(): String? = prefs.getString("last_blocked", null)
 

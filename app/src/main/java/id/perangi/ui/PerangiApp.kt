@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import id.perangi.ui.theme.PerangiTheme
+import id.perangi.family.FamilyScreen
 
 sealed interface Dest
 
@@ -41,6 +42,7 @@ enum class SubScreen(val title: String) : Dest {
     Whitelist("Whitelist"),
     AppScan("Scan Aplikasi"),
     Tentang("Tentang & Pembaruan"),
+    Keluarga("Keluarga"),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,6 +92,7 @@ fun PerangiApp() {
                 SubScreen.Whitelist -> WhitelistScreen(mod)
                 SubScreen.AppScan -> AppScanScreen(mod)
                 SubScreen.Tentang -> AboutScreen(mod)
+                SubScreen.Keluarga -> FamilyScreen(mod)
             }
         }
     }

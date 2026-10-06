@@ -41,6 +41,7 @@ import id.perangi.data.ParentMode
 import id.perangi.data.ReportStore
 import id.perangi.data.StatsRepository
 import id.perangi.data.StreakStore
+import id.perangi.family.HeartbeatWorker
 import id.perangi.util.Logger
 import id.perangi.vpn.Blocklist
 import id.perangi.vpn.KeywordBlock
@@ -65,6 +66,8 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
 
     LaunchedEffect(Unit) {
         BlocklistUpdateWorker.schedule(ctx)
+        // Fase 3b: heartbeat keluarga tiap 15 menit
+        HeartbeatWorker.schedule(ctx)
         // Fase 3a: upload sisa laporan yang belum terkirim ke server
         if (ReportStore.pendingUpload(ctx).isNotEmpty()) {
             ReportUploadWorker.enqueue(ctx)
@@ -173,6 +176,12 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
                     modifier = Modifier.weight(1f)
                 ) { Text("✅ Putih") }
             }
+        }
+        item {
+            Button(
+                onClick = { onNav(SubScreen.Keluarga) },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("👪 Keluarga") }
         }
         item {
             Button(
