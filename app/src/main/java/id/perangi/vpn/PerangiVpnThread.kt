@@ -51,9 +51,15 @@ class PerangiVpnThread(
                     null
                 } ?: continue
                 val name = query.queryName ?: continue
-                val dnsAnswer = if (!WhitelistStore.contains(name) && Blocklist.isBlocked(name)) {
+                val reason = when {
+                    WhitelistStore.contains(name) -> null
+                    Blocklist.isBlocked(name) -> "daftar"
+                    KeywordBlock.matches(name) -> "pola-kata"
+                    else -> null
+                }
+                val dnsAnswer = if (reason != null) {
                     stats.recordBlocked(name)
-                    Logger.d("Filter", "Diblokir: $name")
+                    Logger.d("Filter", "Diblokir [$reason]: $name")
                     DnsPacket.buildNxDomainDns(query)
                 } else {
                     forward(query.dnsPayload, socket) ?: continue

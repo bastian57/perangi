@@ -9,9 +9,9 @@ data class PinjolCheck(val name: String, val status: Status, val note: String) {
 }
 
 /**
- * Database contoh pinjol (aset lokal). BUKAN database resmi OJK —
- * selalu arahkan user verifikasi ke OJK (telp 157). Database penuh
- * menyusul di Fase 2/3 bersama backend laporan komunitas.
+ * Database pinjol dari direktori OJK (aset lokal, dibundel per September 2026).
+ * BUKAN pengganti verifikasi resmi — status izin bisa berubah,
+ * selalu arahkan user verifikasi ke OJK (telp 157).
  */
 object OjkData {
     private var legal: Set<String> = emptySet()
@@ -20,10 +20,10 @@ object OjkData {
 
     fun load(context: Context) {
         try {
-            val json = JSONObject(context.assets.open("ojk_sample.json").bufferedReader().readText())
+            val json = JSONObject(context.assets.open("ojk_pinjol.json").bufferedReader().readText())
             warning = json.optString("_warning")
-            legal = toSet(json.optJSONArray("legal_contoh"))
-            ilegal = toSet(json.optJSONArray("ilegal_contoh"))
+            legal = toSet(json.optJSONArray("legal"))
+            ilegal = toSet(json.optJSONArray("ilegal"))
         } catch (_: Exception) { /* opsional */ }
     }
 
@@ -31,12 +31,18 @@ object OjkData {
         val q = query.trim().lowercase()
         if (q.isEmpty()) return PinjolCheck(query, PinjolCheck.Status.UNKNOWN, "")
         if (legal.any { it.contains(q) || q.contains(it) })
-            return PinjolCheck(query, PinjolCheck.Status.LEGAL, "Ada di database contoh sebagai terdaftar OJK.")
+            return PinjolCheck(
+                query, PinjolCheck.Status.LEGAL,
+                "Terdaftar di direktori OJK (data Sep 2026). Tetap verifikasi ke OJK: telp 157."
+            )
         if (ilegal.any { it.contains(q) || q.contains(it) })
-            return PinjolCheck(query, PinjolCheck.Status.ILEGAL, "Terindikasi ILEGAL — jangan pinjam, segera laporkan.")
+            return PinjolCheck(
+                query, PinjolCheck.Status.ILEGAL,
+                "Izinnya DICABUT OJK — jangan pinjam, segera laporkan ke OJK 157."
+            )
         return PinjolCheck(
             query, PinjolCheck.Status.UNKNOWN,
-            "Tidak ada di database contoh. Verifikasi langsung ke OJK: telp 157."
+            "Tidak ada di direktori OJK — kemungkinan ILEGAL. Verifikasi ke OJK: telp 157."
         )
     }
 

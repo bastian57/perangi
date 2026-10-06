@@ -39,6 +39,7 @@ enum class SubScreen(val title: String) : Dest {
     OrangTua("Mode Orang Tua"),
     Lapor("Laporkan Situs"),
     Whitelist("Whitelist"),
+    AppScan("Scan Aplikasi"),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +87,7 @@ fun PerangiApp() {
                 SubScreen.OrangTua -> ParentModeScreen(mod)
                 SubScreen.Lapor -> ReportScreen(mod)
                 SubScreen.Whitelist -> WhitelistScreen(mod)
+                SubScreen.AppScan -> AppScanScreen(mod)
             }
         }
     }

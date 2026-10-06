@@ -20,9 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.provider.Settings
 import id.perangi.vpn.Blocklist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,6 +38,7 @@ data class HealthItem(val name: String, val ok: Boolean, val detail: String)
  */
 @Composable
 fun HealthScreen(modifier: Modifier = Modifier) {
+    val ctx = LocalContext.current
     var running by remember { mutableStateOf(false) }
     var items by remember { mutableStateOf<List<HealthItem>?>(null) }
     var tick by remember { mutableStateOf(0) }
@@ -88,6 +91,25 @@ fun HealthScreen(modifier: Modifier = Modifier) {
                 "Update otomatis",
                 true,
                 "Jadwal 6 jam terpasang."
+            )
+        )
+
+        // 5. DNS Pribadi harus nonaktif — kalau aktif, filter di-bypass total.
+        val dnsMode = try {
+            Settings.Global.getString(ctx.contentResolver, "private_dns_mode")
+        } catch (_: Exception) {
+            null
+        }
+        val dnsPrivateOk = dnsMode == "off" || dnsMode == null
+        list.add(
+            HealthItem(
+                "DNS Pribadi",
+                dnsPrivateOk,
+                when (dnsMode) {
+                    "off", null -> "Nonaktif — filter berjalan penuh."
+                    "hostname" -> "AKTIF (kustom) — filter DI-BYPASS! Matikan di Setelan → Jaringan → DNS Pribadi."
+                    else -> "Mode Otomatis — sebaiknya Nonaktif agar filter tidak di-bypass."
+                }
             )
         )
 

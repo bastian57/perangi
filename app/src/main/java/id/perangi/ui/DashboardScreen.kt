@@ -41,6 +41,7 @@ import id.perangi.data.StatsRepository
 import id.perangi.data.StreakStore
 import id.perangi.util.Logger
 import id.perangi.vpn.Blocklist
+import id.perangi.vpn.KeywordBlock
 import id.perangi.vpn.PerangiVpnService
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -128,6 +129,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
                         Text("🔥 $streak hari terlindungi")
                         Text("Situs diblokir: $total")
                         Text("Domain di daftar: $domains")
+                        Text("Pola kata: ${KeywordBlock.get().size}")
                     }
                     Switch(
                         checked = running,
@@ -165,6 +167,12 @@ fun DashboardScreen(modifier: Modifier = Modifier, onNav: (Dest) -> Unit) {
                     modifier = Modifier.weight(1f)
                 ) { Text("✅ Putih") }
             }
+        }
+        item {
+            Button(
+                onClick = { onNav(SubScreen.AppScan) },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("📱 Scan Aplikasi Judi/Pinjol") }
         }
         item {
             Text("Terakhir diblokir", style = MaterialTheme.typography.titleMedium)

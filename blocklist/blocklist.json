@@ -1,8 +1,9 @@
 {
   "_notes": [
-    "SEED v2: 7 domain judol dari laporan media pemblokiran Kominfo/Polri (2024-2026).",
-    "Domain judol memakai rotasi agresif — andalkan laporan komunitas (fitur Lapor) untuk update.",
-    "Kategori pinjol_ilegal/iklan_judi masih kosong, menunggu kurasi laporan.",
+    "SEED v3: 7 domain judol (laporan media pemblokiran Kominfo/Polri) + 15 pola kata.",
+    "Pola kata menangkap domain rotasi bandar (contoh: *togel*, *gacor*). False positive -> whitelist.",
+    "'keywords' bisa diupdate jarak jauh tanpa update aplikasi.",
+    "Kategori pinjol_ilegal/iklan_judi menunggu kurasi laporan komunitas.",
     "Kategori doh_bypass: resolver DoH publik — diblokir agar browser tidak bisa bypass filter."
   ],
   "categories": {
@@ -32,6 +33,23 @@
     ],
     "pinjol_ilegal": []
   },
-  "updated": "2026-10-06T15:55:00+07:00",
-  "version": 2
+  "updated": "2026-10-06T17:15:00+07:00",
+  "version": 3,
+  "keywords": [
+    "togel",
+    "gacor",
+    "maxwin",
+    "judol",
+    "judionline",
+    "slotgacor",
+    "gacorslot",
+    "rtpslot",
+    "polaslot",
+    "infoslot",
+    "jamgacor",
+    "gatesofolympus",
+    "starlightprincess",
+    "sweetbonanza",
+    "mahjongways"
+  ]
 }

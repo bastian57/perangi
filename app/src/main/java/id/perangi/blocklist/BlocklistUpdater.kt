@@ -2,6 +2,7 @@ package id.perangi.blocklist
 
 import android.content.Context
 import id.perangi.vpn.Blocklist
+import id.perangi.vpn.KeywordBlock
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -29,6 +30,9 @@ object BlocklistUpdater {
             val version = json.getInt("version")
             if (version <= prefs.getInt("blocklist_version", 0)) return // sudah terbaru
             Blocklist.load(Blocklist.extractDomains(json))
+            json.optJSONArray("keywords")?.let { arr ->
+                KeywordBlock.load((0 until arr.length()).map { arr.getString(it) })
+            }
             prefs.edit().putInt("blocklist_version", version).apply()
         } catch (_: Exception) {
             // Offline / URL belum diisi -> tetap pakai seed bawaan. Bukan error fatal.
