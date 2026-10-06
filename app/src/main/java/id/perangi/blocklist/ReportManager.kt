@@ -16,7 +16,7 @@ object ReportManager {
         val queue = prefs.getStringSet("queue", emptySet())!!.toMutableSet()
         queue.add("${System.currentTimeMillis()}|$category|$domain")
         // Batasi antrean lokal: max 50 laporan (anti-spam sederhana).
-        prefs.edit().putStringSet("queue", queue.takeLast(50).toSet()).apply()
+        prefs.edit().putStringSet("queue", queue.toList().takeLast(50).toSet()).apply()
         // TODO(Fase 3): sinkronkan antrean ke backend saat online.
     }
 
