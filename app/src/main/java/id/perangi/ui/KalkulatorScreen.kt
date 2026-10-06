@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Tab
@@ -43,10 +44,16 @@ fun KalkulatorScreen(modifier: Modifier = Modifier) {
 private fun rupiah(n: Double): String =
     "Rp" + NumberFormat.getNumberInstance(Locale("id")).format(n.toLong())
 
+/** "50000" -> "50.000" untuk tampilan input. */
+private fun formatRibuan(digits: String): String {
+    if (digits.isEmpty()) return ""
+    return digits.reversed().chunked(3).joinToString(".").reversed()
+}
+
 @Composable
 private fun KalkulatorJudol(modifier: Modifier = Modifier) {
-    var harian by remember { mutableStateOf("50000") }
-    val perHari = harian.toDoubleOrNull() ?: 0.0
+    var harianRaw by remember { mutableStateOf("50000") }
+    val perHari = harianRaw.toDoubleOrNull() ?: 0.0
     val perBulan = perHari * 30
     val perTahun = perHari * 365
     val limaTahun = perTahun * 5
@@ -58,14 +65,17 @@ private fun KalkulatorJudol(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            "Kalkulator Rugi Judol",
+            "Kalkulator Hitung Rugi Judol",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleLarge
         )
-        Text("Berapa yang kamu pertaruhkan setiap hari?")
+        Text(
+            "Berapa yang kamu pertaruhkan setiap hari?",
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+        )
         OutlinedTextField(
-            value = harian,
-            onValueChange = { harian = it.filter(Char::isDigit).take(12) },
+            value = formatRibuan(harianRaw),
+            onValueChange = { harianRaw = it.filter(Char::isDigit).take(12) },
             label = { Text("Taruhan per hari (Rp)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
@@ -79,17 +89,18 @@ private fun KalkulatorJudol(modifier: Modifier = Modifier) {
                 "Secara matematis pemain selalu kalah jangka panjang karena bandar " +
                 "mengambil margin (house edge) di setiap taruhan. Uang yang 'diputar' " +
                 "di atas = uang yang pelan-pelan pindah ke kantong bandar.",
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
         )
     }
 }
 
 @Composable
 private fun KalkulatorPinjol(modifier: Modifier = Modifier) {
-    var pokok by remember { mutableStateOf("1000000") }
+    var pokokRaw by remember { mutableStateOf("1000000") }
     var bunga by remember { mutableStateOf("2") }
     var hari by remember { mutableStateOf("30") }
-    val p = pokok.toDoubleOrNull() ?: 0.0
+    val p = pokokRaw.toDoubleOrNull() ?: 0.0
     val b = bunga.toDoubleOrNull() ?: 0.0
     val h = hari.toDoubleOrNull() ?: 0.0
     val total = if (p > 0 && h > 0) p * (1 + b / 100).pow(h) else 0.0
@@ -99,14 +110,17 @@ private fun KalkulatorPinjol(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            "Kalkulator Bunga Pinjol",
+            "Kalkulator Hitung Bunga Pinjol",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleLarge
         )
-        Text("Pinjol ilegal sering mematok bunga HARIAN. Lihat sendiri ngerinya.")
+        Text(
+            "Pinjol ilegal sering mematok bunga HARIAN. Lihat sendiri ngerinya.",
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+        )
         OutlinedTextField(
-            value = pokok,
-            onValueChange = { pokok = it.filter(Char::isDigit).take(12) },
+            value = formatRibuan(pokokRaw),
+            onValueChange = { pokokRaw = it.filter(Char::isDigit).take(12) },
             label = { Text("Pokok pinjaman (Rp)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
@@ -130,20 +144,31 @@ private fun KalkulatorPinjol(modifier: Modifier = Modifier) {
         Text(
             "Pinjam Rp1 juta berbunga 2%/hari jadi Rp1,8 juta dalam sebulan. " +
                 "Inilah kenapa pinjol ilegal menghancurkan hidup.",
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
         )
     }
 }
 
 @Composable
 private fun HasilRow(label: String, value: String) {
-    Card(Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
         Column(Modifier.padding(12.dp)) {
-            Text(label, style = MaterialTheme.typography.bodySmall)
+            Text(
+                label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Text(
                 value,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }

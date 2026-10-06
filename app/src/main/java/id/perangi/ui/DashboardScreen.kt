@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,10 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -58,11 +61,19 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         Logger.d("UI", "Dashboard dibuka")
     }
 
-    // baca ulang setiap ada perubahan status / tombol refresh
     val recent = remember(tick, running) { stats.recentBlocked() }
     val logs = remember(tick, running) { Logger.snapshot().takeLast(40).reversed() }
     val total = remember(tick, running) { stats.totalBlocked() }
     val domains = remember(tick, running) { Blocklist.size() }
+
+    fun setProteksi(on: Boolean) {
+        if (on) {
+            val intent = VpnService.prepare(ctx)
+            if (intent != null) launcher.launch(intent) else startVpnService(ctx)
+        } else {
+            stopVpnService(ctx)
+        }
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize().padding(20.dp),
@@ -72,37 +83,55 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             Text("PERANGI", fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Text(
                 "Perang Melawan Judol & Pinjol Ilegal",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
         }
         item {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(
-                        if (running) "🛡️ Proteksi AKTIF" else "⚠️ Proteksi MATI",
-                        fontSize = 20.sp, fontWeight = FontWeight.Bold
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text("Situs diblokir: $total")
-                    Text("Domain di daftar: $domains")
-                    Spacer(Modifier.height(8.dp))
-                    Button(onClick = {
-                        val intent = VpnService.prepare(ctx)
-                        if (intent != null) launcher.launch(intent) else startVpnService(ctx)
-                    }) {
-                        Text(if (running) "Aktifkan Ulang" else "Aktifkan Proteksi")
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            if (running) "🛡️ TERLINDUNGI" else "⚠️ TIDAK TERLINDUNGI",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (running) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.error
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "Situs diblokir: $total",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            "Domain di daftar: $domains",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
+                    Switch(
+                        checked = running,
+                        onCheckedChange = { setProteksi(it) }
+                    )
                 }
             }
         }
         item {
-            Text("Terakhir diblokir", fontWeight = FontWeight.Bold)
+            Text("Terakhir diblokir", style = MaterialTheme.typography.titleMedium)
         }
         if (recent.isEmpty()) {
             item {
                 Text(
                     "Belum ada — bagus, berarti belum ada yang coba-coba.",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
             }
         } else {
@@ -110,20 +139,34 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 val time = remember(ts) {
                     SimpleDateFormat("dd MMM HH:mm", Locale("id")).format(Date(ts))
                 }
-                Text("🚫 $domain — $time", style = MaterialTheme.typography.bodySmall)
+                Text(
+                    "🚫 $domain — $time",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                )
             }
         }
         item {
             OutlinedButton(onClick = { tick++ }) { Text("Muat ulang") }
         }
         item {
-            Text("Log", fontWeight = FontWeight.Bold)
+            Text("Log", style = MaterialTheme.typography.titleMedium)
         }
         if (logs.isEmpty()) {
-            item { Text("Belum ada log.", style = MaterialTheme.typography.bodySmall) }
+            item {
+                Text(
+                    "Belum ada log.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+            }
         } else {
             items(logs) { line ->
-                Text(line, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    line,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                )
             }
         }
     }
@@ -137,4 +180,13 @@ private fun startVpnService(ctx: Context) {
         .edit().putBoolean("vpn_enabled", true).apply()
     VpnState.running = true
     Logger.d("UI", "VPN dimulai dari dashboard")
+}
+
+private fun stopVpnService(ctx: Context) {
+    ctx.startForegroundService(
+        Intent(ctx, PerangiVpnService::class.java).setAction(PerangiVpnService.ACTION_STOP)
+    )
+    ctx.getSharedPreferences("perangi", Context.MODE_PRIVATE)
+        .edit().putBoolean("vpn_enabled", false).apply()
+    Logger.d("UI", "VPN dihentikan dari dashboard")
 }

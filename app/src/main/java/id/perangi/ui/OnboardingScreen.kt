@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import id.perangi.util.Logger
 import id.perangi.vpn.PerangiVpnService
@@ -57,15 +59,21 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 Text(
                     "Selamat datang di PERANGI",
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "Aplikasi ini memblokir situs judi online, pinjol ilegal, dan iklan judi " +
-                        "langsung di HP-mu — tanpa root. Semua penyaringan diproses lokal di HP ini."
+                        "langsung di HP-mu — tanpa root. Semua penyaringan diproses lokal di HP ini.",
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                 )
                 Spacer(Modifier.height(24.dp))
-                Button(onClick = { step = 1 }, modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = { step = 1 },
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
+                ) {
                     Text("Lanjut")
                 }
             }
@@ -73,12 +81,15 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 Text(
                     "Langkah 1: Aktifkan Proteksi",
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "Android akan meminta izin VPN. Ini VPN LOKAL — datamu tidak dikirim " +
-                        "ke server mana pun."
+                        "ke server mana pun.",
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                 )
                 Spacer(Modifier.height(24.dp))
                 Button(
@@ -90,7 +101,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                             step = 2
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
                 ) {
                     Text("Aktifkan VPN")
                 }
@@ -99,14 +110,16 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 Text(
                     "Langkah 2: Matikan Secure DNS",
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "Agar blokir tidak bisa diakali browser, matikan DNS aman:\n\n" +
                         "Chrome: ⋮ → Setelan → Privasi dan keamanan → " +
                         "Gunakan DNS aman → NONAKTIF\n\n" +
-                        "HP: Setelan → Jaringan → DNS Pribadi → Nonaktif"
+                        "HP: Setelan → Jaringan → DNS Pribadi → Nonaktif",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                 )
                 Spacer(Modifier.height(24.dp))
                 Button(
@@ -114,12 +127,19 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                         Logger.d("UI", "Onboarding selesai")
                         onFinish()
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
                 ) {
                     Text("Selesai — Mulai Lindungi HP")
                 }
             }
         }
+        Spacer(Modifier.height(16.dp))
+        // indikator langkah
+        Text(
+            "●".repeat(step + 1) + "○".repeat(2 - step),
+            color = MaterialTheme.colorScheme.secondary,
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -42,7 +43,8 @@ fun CekPinjolScreen(modifier: Modifier = Modifier) {
         )
         Text(
             "Ketik nama aplikasi pinjol untuk cek statusnya.",
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
         )
         OutlinedTextField(
             value = query,
@@ -62,22 +64,36 @@ fun CekPinjolScreen(modifier: Modifier = Modifier) {
                 PinjolCheck.Status.ILEGAL -> "🚫" to "ILEGAL"
                 PinjolCheck.Status.UNKNOWN -> "❓" to "TIDAK DIKENAL"
             }
-            Card(Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
                 Column(
                     Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text("$emoji $label", fontWeight = FontWeight.Bold)
                     if (r.note.isNotEmpty()) {
-                        Text(r.note, style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            r.note,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
         }
-        Text(OjkData.warning(), style = MaterialTheme.typography.bodySmall)
+        Text(
+            OjkData.warning(),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+        )
         Text(
             "Butuh bantuan atau mau lapor? Hubungi OJK di 157 (Senin–Jumat).",
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
         )
     }
 }
